@@ -13,16 +13,16 @@ function Sidebar({ sidebarOpen, selectProject }) {
             <MdSpaceDashboard fontSize={20} /> <Text>Dashboard</Text>
           </Button>
           <Box mt={3} px={4}>
-            <Text fontSize="small" fontWeight="bold">Your Projects</Text>
+            <Text fontSize="xs" fontWeight="bold">Your Projects</Text>
           </Box>
           <Flex direction="column">
-            <Button variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 1'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 1'); navigate('/'); }}>
               Project 1
             </Button>
-            <Button variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 2'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 2'); navigate('/'); }}>
               Project 2
             </Button>
-            <Button variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 3'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 3'); navigate('/'); }}>
               Project 3
             </Button>
           </Flex>
