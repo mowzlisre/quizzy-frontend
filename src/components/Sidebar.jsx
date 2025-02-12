@@ -16,13 +16,13 @@ function Sidebar({ sidebarOpen, selectProject }) {
             <Text fontSize="xs" fontWeight="bold">Your Projects</Text>
           </Box>
           <Flex direction="column">
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 1'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 1'); navigate('/id'); }}>
               Project 1
             </Button>
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 2'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 2'); navigate('/id'); }}>
               Project 2
             </Button>
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 3'); navigate('/'); }}>
+            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 3'); navigate('/id'); }}>
               Project 3
             </Button>
           </Flex>

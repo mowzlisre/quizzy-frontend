@@ -1,0 +1,105 @@
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Heading,
+  HStack,
+  Stepper,
+  Step,
+  StepIndicator,
+  StepStatus,
+  StepSeparator,
+  StepIcon,
+  useSteps,
+  Card,
+} from "@chakra-ui/react";
+import { useNavigate, useParams } from "react-router-dom";
+import StepTitle from "./Assessments/StepTitle";
+import StepMaterials from "./Assessments/StepMaterials";
+import StepConcentration from "./Assessments/StepConcentration";
+import StepQuestions from "./Assessments/StepQuestions";
+
+const steps = [
+  { title: "Title", component: StepTitle },
+  { title: "Materials", component: StepMaterials },
+  { title: "Concentration", component: StepConcentration },
+  { title: "Questions", component: StepQuestions },
+];
+
+const NewAssessment = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { activeStep, setActiveStep } = useSteps({ index: 0, count: steps.length });
+
+  // Form States
+  const [title, setTitle] = useState("");
+  const [materials, setMaterials] = useState([]);
+  const [concentration, setConcentration] = useState([]);
+  const [additionalInfo, setAdditionalInfo] = useState("")
+  const [questionCounts, setQuestionCounts] = useState({ mcq: 0, maq: 0, shortAnswer: 0, longAnswer: 0 });
+  const [valid, setValid] = useState(false);
+
+  // Handle Step Navigation
+  const nextStep = () => activeStep < steps.length - 1 && setActiveStep(activeStep + 1);
+  const prevStep = () => activeStep > 0 && setActiveStep(activeStep - 1);
+
+  // Handle Form Submission
+  const handleSubmit = () => {
+    const assessmentData = { id, title, materials, concentration, questionCounts };
+    console.log("Assessment Created:", assessmentData);
+    navigate(-1);
+  };
+
+  const ActiveStepComponent = steps[activeStep].component;
+
+  useEffect(() => {
+    if (activeStep === 0) {
+      setValid(title.trim().length >= 10);
+    } else if (activeStep === 1) {
+      setValid(materials.length > 0);
+    } else {
+      setValid(true);
+    }
+  }, [title, materials, activeStep]);
+  
+
+  return (
+    <Box p={6} mx="auto">
+      <Card p={10} gap={2}>
+        <Heading size="md" mb={6}>Create a New Assessment</Heading>
+
+        <Stepper w={"300px"} size="sm" index={activeStep} colorScheme="blue">
+          {steps.map((step, index) => (
+            <Step key={index}>
+              <StepIndicator>
+                <StepStatus complete={<StepIcon />} />
+              </StepIndicator>
+              <StepSeparator />
+            </Step>
+          ))}
+        </Stepper>
+      
+        <Box maxW={"600px"} mt={6}>
+          <ActiveStepComponent
+            title={title} setTitle={setTitle}
+            materials={materials} setMaterials={setMaterials}
+            concentration={concentration} setConcentration={setConcentration}
+            additionalInfo={additionalInfo} setAdditionalInfo={setAdditionalInfo}
+            questionCounts={questionCounts} setQuestionCounts={setQuestionCounts}
+          />
+        </Box>
+
+        <HStack justify="space-between" mt={6}>
+          <Button isDisabled={activeStep === 0} onClick={prevStep}>Back</Button>
+          {activeStep === steps.length - 1 ? (
+            <Button colorScheme="green" onClick={handleSubmit} isDisabled={!valid}>Submit</Button>
+          ) : (
+            <Button colorScheme="blue" onClick={nextStep} isDisabled={!valid}>Next</Button>
+          )}
+        </HStack>
+      </Card>
+    </Box>
+  );
+};
+
+export default NewAssessment;

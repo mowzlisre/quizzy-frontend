@@ -11,6 +11,7 @@ import {
   Tag,
   useColorModeValue,
   Text,
+  Flex,
 } from "@chakra-ui/react";
 
 const assessments = [
@@ -98,7 +99,6 @@ const AssessmentTable = ({ project }) => {
   const textColor = useColorModeValue("gray.700", "gray.300");
 
   return (
-    <Box>
       <TableContainer>
         <Table variant="unstyled" size="sm" borderRadius={"lg"}>
           <Thead>
@@ -137,7 +137,6 @@ const AssessmentTable = ({ project }) => {
           </Tbody>
         </Table>
       </TableContainer>
-    </Box>
   );
 };
 

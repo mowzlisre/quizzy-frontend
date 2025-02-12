@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Sandbox from './components/Sandbox';
+import NewAssessment from './components/NewAssessment';
 
 function App() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -21,7 +22,8 @@ function App() {
           <Sidebar sidebarOpen={sidebarOpen} selectProject={selectProject} />
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/*" element={<Sandbox project={project} />} />
+            <Route path="/id" element={<Sandbox project={project} />} />
+            <Route path="/id/new" element={<NewAssessment />} />
           </Routes>
         </Flex>
       </Flex>
