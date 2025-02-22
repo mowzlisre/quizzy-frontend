@@ -10,7 +10,6 @@ const AggregateScore = ({ value, label }) => {
 
   return (
     <Box textAlign="center">
-      {/* Circular Progress Bar */}
       <Box 
         mx="auto"
         position="relative"

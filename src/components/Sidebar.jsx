@@ -1,10 +1,28 @@
+import { useState, useEffect } from 'react';
 import { Box, Button, Flex, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { MdSpaceDashboard } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
+import { projectsViewAPI } from '../api';
 
 function Sidebar({ sidebarOpen, selectProject }) {
-  const sidebarBg = useColorModeValue('white','gray.800');
+  const [projects, setProjects] = useState([]);
+  const sidebarBg = useColorModeValue('white', 'gray.800');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await projectsViewAPI();
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+  
+
   return (
     <Box width={{ base: '0', md: sidebarOpen ? '300px' : '0px' }} bg={sidebarBg} overflow="hidden" transition="width 0.3s ease-in-out">
       <Box p={4} opacity={sidebarOpen ? 1 : 0} transition="opacity 0.2s ease-in-out">
@@ -16,15 +34,33 @@ function Sidebar({ sidebarOpen, selectProject }) {
             <Text fontSize="xs" fontWeight="bold">Your Projects</Text>
           </Box>
           <Flex direction="column">
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 1'); navigate('/id'); }}>
-              Project 1
-            </Button>
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 2'); navigate('/id'); }}>
-              Project 2
-            </Button>
-            <Button fontSize={'sm'} variant="ghost" fontWeight="normal" justifyContent="flex-start" onClick={() => { selectProject('Project 3'); navigate('/id'); }}>
-              Project 3
-            </Button>
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <Button
+                  key={project.id}
+                  fontSize={'sm'}
+                  variant="ghost"
+                  fontWeight="normal"
+                  justifyContent="flex-start"
+                  onClick={() => { selectProject(project.name); navigate(`/p/${project.id}`); }}
+                  maxWidth={"100%"}
+                >
+                  <Text 
+                    isTruncated 
+                    maxWidth="90%"  // ✅ Ensures text doesn't exceed button width
+                    noOfLines={1}   // ✅ Limits text to one line
+                    display="block" 
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                  >
+                    {project.name}
+                  </Text>
+                </Button>
+              ))
+            ) : (
+              <Text fontSize="sm" px={4} color="gray.500">No projects available</Text>
+            )}
           </Flex>
         </Stack>
       </Box>
