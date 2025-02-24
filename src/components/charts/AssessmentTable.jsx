@@ -1,73 +1,8 @@
-import React from "react";
-import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Tag,
-  useColorModeValue,
-  Text,
-  Flex,
-} from "@chakra-ui/react";
+import { Table, TableContainer, Tag, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { projectAssessmentsViewAPI } from "../../api";
+import { useNavigate } from "react-router-dom";
 
-const assessments = [
-  {
-    id: "A101",
-    title: "React Basics",
-    created: "3 days ago",
-    difficulty: "Easy",
-    attempts: 5,
-    recentAttempt: "1 day ago",
-    status: "Completed",
-    avgScore: "87%",
-  },
-  {
-    id: "A102",
-    title: "JavaScript Fundamentals",
-    created: "1 day ago",
-    difficulty: "Medium",
-    attempts: 3,
-    recentAttempt: "6 hours ago",
-    status: "In Progress",
-    avgScore: "78%",
-  },
-  {
-    id: "A103",
-    title: "HTML & CSS Mastery",
-    created: "6 hours ago",
-    difficulty: "Hard",
-    attempts: 2,
-    recentAttempt: "Just now",
-    status: "Not Started",
-    avgScore: "N/A",
-  },
-  {
-    id: "A104",
-    title: "Data Structures",
-    created: "5 days ago",
-    difficulty: "Hard",
-    attempts: 7,
-    recentAttempt: "2 days ago",
-    status: "Completed",
-    avgScore: "92%",
-  },
-  {
-    id: "A105",
-    title: "Python for Beginners",
-    created: "2 days ago",
-    difficulty: "Easy",
-    attempts: 4,
-    recentAttempt: "10 hours ago",
-    status: "In Progress",
-    avgScore: "84%",
-  },
-];
-
-// Function to get the color for difficulty
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
     case "Easy":
@@ -81,7 +16,6 @@ const getDifficultyColor = (difficulty) => {
   }
 };
 
-// Function to get the color for status
 const getStatusColor = (status) => {
   switch (status) {
     case "Completed":
@@ -95,8 +29,25 @@ const getStatusColor = (status) => {
   }
 };
 
-const AssessmentTable = ({ project }) => {
+const AssessmentTable = ({ uuid }) => {
   const textColor = useColorModeValue("gray.700", "gray.300");
+  const [assessments, setAssessments] = useState([])
+  const navigate = useNavigate()
+
+  useEffect(() => {
+      if(uuid){
+          const fetchAssessments = async () => {
+          try {
+              const response = await projectAssessmentsViewAPI(uuid);
+              setAssessments(response.data);
+          } catch (error) {
+              console.error("Error fetching projects:", error);
+          }
+          };
+      
+          fetchAssessments();
+      }
+    }, [uuid]);
 
   return (
       <TableContainer>
@@ -115,16 +66,20 @@ const AssessmentTable = ({ project }) => {
           </Thead>
           <Tbody>
             {assessments.map((assessment) => (
-              <Tr key={assessment.id} role="button">
-                <Td>{assessment.id}</Td>
-                <Td>{assessment.title}</Td>
+              <Tr key={assessment.assessment_id} role="button" onClick={() => navigate(`/a/${assessment.id}`)}>
+                <Td>{assessment.assessment_id}</Td>
+                <Td>
+                  <Text isTruncated maxWidth="90%"noOfLines={1}display="block" whiteSpace="nowrap"overflow="hidden"textOverflow="ellipsis">
+                    {assessment.assessment_title}
+                  </Text>
+                </Td>
                 <Td>{assessment.created}</Td>
                 <Td textAlign="center">
                   <Tag width="70px" size="sm" colorScheme={getDifficultyColor(assessment.difficulty)}>
                     <Text mx="auto">{assessment.difficulty}</Text>
                   </Tag>
                 </Td>
-                <Td>{assessment.attempts}</Td>
+                <Td>{assessment.attempts.length}</Td>
                 <Td>{assessment.recentAttempt}</Td>
                 <Td>
                   <Tag size="sm" colorScheme={getStatusColor(assessment.status)}>

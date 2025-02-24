@@ -1,30 +1,30 @@
-import { useState } from 'react';
 import { Flex, useColorMode, useColorModeValue } from '@chakra-ui/react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
+import { useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
-import Sandbox from './components/Sandbox';
+import Navbar from './components/Navbar';
 import NewAssessment from './components/NewAssessment';
+import Sandbox from './components/Sandbox';
+import Sidebar from './components/Sidebar';
 import Login from './components/auth/Login';
+import CreateProject from './components/CreateProject';
 
 function Layout() {
   const { colorMode, toggleColorMode } = useColorMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [project, setProject] = useState(null);
   const bg = useColorModeValue('gray.50', 'gray.900');
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const selectProject = (proj) => setProject(proj === 'new' ? null : proj);
 
   return (
     <Flex direction="column" height="100vh" bg={bg}>
       <Navbar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} colorMode={colorMode} toggleColorMode={toggleColorMode} />
       <Flex flex="1" overflow="hidden">
-        <Sidebar sidebarOpen={sidebarOpen} selectProject={selectProject} />
+        <Sidebar sidebarOpen={sidebarOpen}/>
         <Routes>
+          <Route path="new" element={<CreateProject />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="p/*" element={<Sandbox project={project} />} />
+          <Route path=":type/:uuid" element={<Sandbox />} />
           <Route path="id/new" element={<NewAssessment />} />
           <Route path="*" element={<Navigate to="/app/dashboard" />} />
         </Routes>

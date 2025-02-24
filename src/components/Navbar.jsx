@@ -5,7 +5,7 @@ import { TbLayoutSidebarFilled, TbLogout } from "react-icons/tb";
 import { logoutAPI } from '../api';
 import { useNavigate } from 'react-router-dom';
 
-function Navbar({ toggleSidebar, openNewSandbox, colorMode, toggleColorMode }) {
+function Navbar({ toggleSidebar, colorMode, toggleColorMode }) {
   const headerBg = useColorModeValue('white', 'gray.700');
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ function Navbar({ toggleSidebar, openNewSandbox, colorMode, toggleColorMode }) {
     <Flex bg={headerBg} p={4} align="center" justify="space-between" borderBottom="1px" borderColor={useColorModeValue('gray.200', 'gray.600')}>
       <Flex align="center">
         <Button p={0} variant={"ghost"} onClick={toggleSidebar}><TbLayoutSidebarFilled fontSize={25} /></Button>
-        <Button p={0} variant={"ghost"} onClick={openNewSandbox} mr={2}><LuFolderPen fontSize={23} /></Button>
+        <Button p={0} variant={"ghost"} onClick={() => navigate('/new')} mr={2}><LuFolderPen fontSize={23} /></Button>
         <Text fontSize="xl" fontWeight="bold">Quizzy</Text>
       </Flex>
       <Flex>

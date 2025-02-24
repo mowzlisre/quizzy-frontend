@@ -25,5 +25,8 @@ export const logoutAPI = async () => {
 };
 
 export const projectsViewAPI = () => API.get("api/projects");
+export const projectViewAPI = (uuid) => API.get(`api/project/${uuid}`);
+export const projectAssessmentsViewAPI = (uuid) => API.get(`api/project/${uuid}/assessments`);
+export const assessmentViewAPI = (uuid) => API.get(`/api/assessment/${uuid}`);
 
 export default API;

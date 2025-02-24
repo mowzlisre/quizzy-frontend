@@ -1,6 +1,6 @@
+import { Box, Button, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react";
 import React from "react";
-import { Box, Text, VStack, Button, Icon, useColorModeValue } from "@chakra-ui/react";
-import { FaFilePdf, FaFileWord, FaFileAlt, FaFileExcel, FaFilePowerpoint, FaFileImage } from "react-icons/fa";
+import { FaFileAlt, FaFileExcel, FaFileImage, FaFilePdf, FaFilePowerpoint, FaFileWord } from "react-icons/fa";
 
 const files = [
   { name: "Course Material.pdf", type: "pdf" },
@@ -27,17 +27,20 @@ const getFileIcon = (type) => {
   }
 };
 
-const FileList = () => {
+const FileList = ({data}) => {
   const textColor = useColorModeValue("gray.700", "gray.300");
-
   return (
-    <Box py={2}borderRadius="md" boxShadow="sm">
-      <Text px={3} fontSize="sm" fontWeight="bold" mb={2} color={textColor}>
-        Project Materials
-      </Text>
+    data &&
+    <Box py={2} borderRadius="md" boxShadow="sm">
+      <Flex justifyContent="space-between">
+        <Text px={3} fontSize="sm" fontWeight="bold" mb={2} color={textColor}>
+          Project Materials
+        </Text>
+        <Button colorScheme="blue" size={'xs'}>Upload</Button>
+      </Flex>
       <Box align="start" overflowY="auto" h="270px">
-        {files.map((file, index) => {
-          const { icon, color } = getFileIcon(file.type);
+        {data.map((file, index) => {
+          const { icon, color } = getFileIcon(file.file_type);
           return (
             <Button key={index} w="full" size={'sm'} justifyContent="start" leftIcon={<Icon as={icon} boxSize={4} color={color} />} variant="ghost" fontSize={'sm'}>
               {file.name}

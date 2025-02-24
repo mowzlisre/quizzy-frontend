@@ -4,7 +4,7 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { projectsViewAPI } from '../api';
 
-function Sidebar({ sidebarOpen, selectProject }) {
+function Sidebar({ sidebarOpen }) {
   const [projects, setProjects] = useState([]);
   const sidebarBg = useColorModeValue('white', 'gray.800');
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ function Sidebar({ sidebarOpen, selectProject }) {
                   variant="ghost"
                   fontWeight="normal"
                   justifyContent="flex-start"
-                  onClick={() => { selectProject(project.name); navigate(`/p/${project.id}`); }}
+                  onClick={() => navigate(`/p/${project.id}`)}
                   maxWidth={"100%"}
                 >
                   <Text 
