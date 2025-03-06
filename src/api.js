@@ -6,6 +6,10 @@ const API = axios.create({
     baseURL: base_url, 
 });
 
+const API_MP = axios.create({
+    baseURL: base_url, 
+});
+
 API.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
     if (token) {
@@ -13,6 +17,16 @@ API.interceptors.request.use((config) => {
     }
     return config;
 });
+
+API_MP.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        config.headers["Content-Type"] = "multipart/form-data"
+    }
+    return config;
+});
+
 
 export const verifyAPI = () => API.get("verify-token");
 export const loginAPI = (username, password) => API.post("login", { username, password });
@@ -28,5 +42,6 @@ export const projectsViewAPI = () => API.get("api/projects");
 export const projectViewAPI = (uuid) => API.get(`api/project/${uuid}`);
 export const projectAssessmentsViewAPI = (uuid) => API.get(`api/project/${uuid}/assessments`);
 export const assessmentViewAPI = (uuid) => API.get(`/api/assessment/${uuid}`);
+export const materialUpload = (uuid, data) => API_MP.post(`/api/project/${uuid}/upload`, data);
+export const materialDelete = (uuid, id) => API.post(`/api/project/${uuid}/delete`, {id});
 
-export default API;

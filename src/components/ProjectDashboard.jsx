@@ -32,7 +32,9 @@ function ProjectDashboard() {
             fetchProjects();
         }
       }, [uuid]);
+
     return (
+        project &&
         <Flex direction={'column'} p={4} width="100%" gap={4} overflowY={'auto'}>
             <Grid width="100%" templateColumns={{ base: '1fr', md: '1fr 2fr 1fr' }} alignItems={"stretch"} gap={4}>
                 <Box>
