@@ -1,13 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Input, Stack, Text, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { loginAPI } from "../../api";
+import { loginAPI, verifyTokenAPI } from "../../api";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const toast = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const accessToken = localStorage.getItem("access_token");
+
+      if (accessToken) {
+        try {
+          const response = await verifyTokenAPI(accessToken); // Call the verify token API
+
+          // If the response is successful, navigate to the dashboard
+          if (response.status === 200 && response.data.message === "Token is valid") {
+            navigate("/dashboard");
+          }
+        } catch (error) {
+          // Token verification failed, user is not logged in
+          console.log("No valid session found.");
+        }
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
 
   const handleLogin = async () => {
     try {

@@ -5,7 +5,7 @@ import AggregateScore from "./charts/AggregateScore";
 import AssessmentTable from "./charts/AssessmentTable";
 import FileList from "./charts/FileList";
 import { useEffect, useState } from "react";
-import { projectViewAPI } from "../api";
+import { handleAPIErrors, projectViewAPI } from "../api";
 
 function ProjectDashboard() {
     const navigate = useNavigate();
@@ -25,7 +25,8 @@ function ProjectDashboard() {
                 const response = await projectViewAPI(uuid);
                 setProject(response.data);
             } catch (error) {
-                console.error("Error fetching projects:", error);
+                console.log("Handle")
+                handleAPIErrors(error, navigate)
             }
             };
         

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Button, Flex, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { MdSpaceDashboard } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
-import { projectsViewAPI } from '../api';
+import { handleAPIErrors, projectsViewAPI } from '../api';
 
 function Sidebar({ sidebarOpen }) {
   const [projects, setProjects] = useState([]);
@@ -15,7 +15,7 @@ function Sidebar({ sidebarOpen }) {
         const response = await projectsViewAPI();
         setProjects(response.data);
       } catch (error) {
-        console.error("Error fetching projects:", error);
+        handleAPIErrors(error, navigate)
       }
     };
 

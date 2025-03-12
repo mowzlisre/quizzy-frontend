@@ -28,12 +28,13 @@ API_MP.interceptors.request.use((config) => {
 });
 
 
-export const verifyAPI = () => API.get("verify-token");
+export const verifyTokenAPI = () => API.get("verify-token");
 export const loginAPI = (username, password) => API.post("login", { username, password });
 export const refreshTokenAPI = (refresh) => API.post("token/refresh", { refresh });
 export const logoutAPI = async () => {
     const refresh = localStorage.getItem("refresh_token");
-    if (!refresh) { return; }
+    localStorage.removeItem("access_token")
+    if (!refresh) { return  ; }
     try { return await API.post("logout", { refresh }); }
     catch (error) {}
 };
@@ -45,3 +46,8 @@ export const assessmentViewAPI = (uuid) => API.get(`/api/assessment/${uuid}`);
 export const materialUpload = (uuid, data) => API_MP.post(`/api/project/${uuid}/upload`, data);
 export const materialDelete = (uuid, id) => API.post(`/api/project/${uuid}/delete`, {id});
 
+export function handleAPIErrors (error, navigate){
+    if(error.status === 401){
+        navigate('/login')
+      }
+}

@@ -1,6 +1,6 @@
 import { Table, TableContainer, Tag, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { projectAssessmentsViewAPI } from "../../api";
+import { handleAPIErrors, projectAssessmentsViewAPI } from "../../api";
 import { useNavigate } from "react-router-dom";
 
 const getDifficultyColor = (difficulty) => {
@@ -41,7 +41,7 @@ const AssessmentTable = ({ uuid }) => {
               const response = await projectAssessmentsViewAPI(uuid);
               setAssessments(response.data);
           } catch (error) {
-              console.error("Error fetching projects:", error);
+              handleAPIErrors(error, navigate)
           }
           };
       
