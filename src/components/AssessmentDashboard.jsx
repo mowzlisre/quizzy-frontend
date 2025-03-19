@@ -2,12 +2,16 @@ import {
     Box, Button, Card, Flex, Stat, StatLabel, StatNumber, Text,
     useColorModeValue, useDisclosure, Modal, ModalOverlay, ModalContent,
     ModalHeader, ModalBody, ModalFooter, ModalCloseButton, ButtonGroup,
-    Checkbox, VStack
+    Checkbox, VStack,
+    HStack,
+    useNumberInput,
+    Input
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { assessmentViewAPI } from "../api";
 import AttemptsTable from "./charts/AttemptsTable";
 import { LuAlarmClockCheck, LuAlarmClockOff } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 function AssessmentDashboard({ uuid }) {
     const color = useColorModeValue("gray.100", "gray.700");
@@ -21,12 +25,26 @@ function AssessmentDashboard({ uuid }) {
         { label: "All-Time Best", value: "N/A" },
         { label: "Max Score", value: "N/A" },
     ]);
+    const navigate = useNavigate()
 
     // State for settings
     const [mode, setMode] = useState("Untimed"); // Default mode
     const [partialScoring, setPartialScoring] = useState(false);
     const [negativeScoring, setNegativeScoring] = useState(false);
     const [proctoredMode, setProctoredMode] = useState(false);
+    const [duration, setDuration] = useState(20); // keep as numeric
+
+    const format = (val) => `${val} Minutes`;
+    const parse = (val) => Number(val.replace(/\s*Minutes$/, '').trim());
+
+    const inc = {
+    onClick: () => setDuration((prev) => (prev < 120 ? prev + 5 : prev)),
+    };
+
+    const dec = {
+    onClick: () => setDuration((prev) => (prev > 10 ? prev - 5 : prev)),
+    };
+
 
     useEffect(() => {
         if (uuid) {
@@ -128,7 +146,6 @@ function AssessmentDashboard({ uuid }) {
                                             <Box><LuAlarmClockCheck fontSize={50} /></Box>
                                             <Text textAlign="center">Timed</Text>
                                         </Flex>
-
                                     </Button>
                                 </Box>
                                 <Box flex="1" aspectRatio={1} minW="50px">
@@ -146,6 +163,22 @@ function AssessmentDashboard({ uuid }) {
                                     </Button>
                                 </Box>
                             </Flex>
+                            {
+                                mode === "Timed" &&
+                                <Flex>
+                                    <HStack>
+                                        <Button {...dec}>-</Button>
+                                        <Input
+                                            textAlign={'center'}
+                                            border={'none'}
+                                            value={format(duration)}
+                                            readOnly
+                                        />
+                                        <Button {...inc}>+</Button>
+                                    </HStack>
+                                    <Box m={'auto'}><LuAlarmClockCheck fontSize={25} /></Box>
+                                </Flex>
+                            }
                             <ButtonGroup isAttached w="100%" justifyContent="center">
                                 <Button
                                     onClick={() => setPartialScoring(!partialScoring)}
@@ -177,7 +210,7 @@ function AssessmentDashboard({ uuid }) {
                                     Proctored
                                 </Button>
                             </ButtonGroup>
-                            <Button colorScheme="green" fontSize={'sm'} onClick={onClose}>
+                            <Button colorScheme="green" fontSize={'sm'} onClick={() => navigate('/n/6accc545-6271-4780-9541-39c1f1850aeb')}>
                                 Start Assessment
                             </Button>
                         </Flex>

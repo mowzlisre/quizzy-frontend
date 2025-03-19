@@ -8,6 +8,7 @@ import Sandbox from './components/Sandbox';
 import Sidebar from './components/Sidebar';
 import Login from './components/auth/Login';
 import CreateProject from './components/CreateProject';
+import NewAttempt from './components/Assessment/NewAttempt';
 
 function Layout() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -45,6 +46,7 @@ function App() {
 
         {/* Redirect root to /app/dashboard */}
         <Route path="*" element={<Navigate to="/app/dashboard" />} />
+        <Route path="/n/:uuid" element={<NewAttempt/>} />
       </Routes>
     </BrowserRouter>
   );
