@@ -1,11 +1,19 @@
-import { Box, Button, Card, Flex, Stat, StatLabel, StatNumber, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+    Box, Button, Card, Flex, Stat, StatLabel, StatNumber, Text,
+    useColorModeValue, useDisclosure, Modal, ModalOverlay, ModalContent,
+    ModalHeader, ModalBody, ModalFooter, ModalCloseButton, ButtonGroup,
+    Checkbox, VStack
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { assessmentViewAPI } from "../api";
 import AttemptsTable from "./charts/AttemptsTable";
+import { LuAlarmClockCheck, LuAlarmClockOff } from "react-icons/lu";
 
 function AssessmentDashboard({ uuid }) {
     const color = useColorModeValue("gray.100", "gray.700");
     const statbox = useColorModeValue("gray.200", "gray.600");
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     const [assessment, setAssessment] = useState(null);
     const [stats, setStats] = useState([
         { label: "Mean", value: "N/A" },
@@ -13,6 +21,12 @@ function AssessmentDashboard({ uuid }) {
         { label: "All-Time Best", value: "N/A" },
         { label: "Max Score", value: "N/A" },
     ]);
+
+    // State for settings
+    const [mode, setMode] = useState("Untimed"); // Default mode
+    const [partialScoring, setPartialScoring] = useState(false);
+    const [negativeScoring, setNegativeScoring] = useState(false);
+    const [proctoredMode, setProctoredMode] = useState(false);
 
     useEffect(() => {
         if (uuid) {
@@ -54,14 +68,17 @@ function AssessmentDashboard({ uuid }) {
         return scores.length % 2 !== 0 ? scores[mid] : ((scores[mid - 1] + scores[mid]) / 2).toFixed(2);
     }
 
-    console.log(assessment)
-
     return (
         assessment &&
         <Flex direction={'column'} width={"100%"} p={8}>
             <Flex justify="space-between" align="center" mb={6}>
-                <Box><Text fontSize={'2xl'}>{assessment.assessment_title}</Text> <Text fontSize={'xs'}>Generated <b>{assessment.created}</b></Text></Box>
-                <Button colorScheme="blue" size={"sm"}>Take Assessment</Button>
+                <Box>
+                    <Text fontSize={'2xl'}>{assessment.assessment_title}</Text>
+                    <Text fontSize={'xs'}>Generated <b>{assessment.created}</b></Text>
+                </Box>
+                <Flex gap={3}>
+                    <Button colorScheme="blue" size={"sm"} onClick={onOpen}>Take Assessment</Button>
+                </Flex>
             </Flex>
             <Box bg={color} p={4} borderRadius="md" mb={6}>
                 <Flex px={5} justify="space-between">
@@ -91,6 +108,82 @@ function AssessmentDashboard({ uuid }) {
             <Card justifyContent={'center'} p={0} pb={3}>
                 <AttemptsTable data={assessment.attempts} />
             </Card>
+
+            {/* New Assessment Instructions Modal */}
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalBody p={8}>
+                        <Text fontWeight="bold" mb={4}>Select Your preferences for this Attempt</Text>
+                        <Flex direction={'column'} gap={4}>
+                            <Flex gap={4} justify="center">
+                                <Box flex="1" aspectRatio={1} minW="50px">
+                                    <Button
+                                        colorScheme={mode === "Timed" ? "blue" : "gray"}
+                                        onClick={() => setMode("Timed")}
+                                        w="100%"
+                                        h="100%"
+                                    >
+                                        <Flex justifyContent="center" alignItems="center" direction="column" gap={2}>
+                                            <Box><LuAlarmClockCheck fontSize={50} /></Box>
+                                            <Text textAlign="center">Timed</Text>
+                                        </Flex>
+
+                                    </Button>
+                                </Box>
+                                <Box flex="1" aspectRatio={1} minW="50px">
+                                    <Button
+                                        colorScheme={mode === "Timed" ? "gray" : "blue"}
+                                        onClick={() => setMode("Untimed")}
+                                        w="100%"
+                                        h="100%"
+                                    >
+                                        <Flex justifyContent="center" alignItems="center" direction="column" gap={2}>
+                                            <Box><LuAlarmClockOff fontSize={50} /></Box>
+                                            <Text textAlign="center">Untimed</Text>
+                                        </Flex>
+
+                                    </Button>
+                                </Box>
+                            </Flex>
+                            <ButtonGroup isAttached w="100%" justifyContent="center">
+                                <Button
+                                    onClick={() => setPartialScoring(!partialScoring)}
+                                    colorScheme={partialScoring ? "green" : "gray"}
+                                    flex="1"
+                                    borderColor="gray.300"
+                                    fontSize={'sm'}
+                                >
+                                    Partial
+                                </Button>
+                                <Button
+                                    onClick={() => setNegativeScoring(!negativeScoring)}
+                                    colorScheme={negativeScoring ? "red" : "gray"}
+                                    flex="1"
+                                    borderLeft="0.5px solid"
+                                    borderRight="0.5px solid"
+                                    borderColor="gray.500"
+                                    fontSize={'sm'}
+                                >
+                                    Negative
+                                </Button>
+                                <Button
+                                    onClick={() => setProctoredMode(!proctoredMode)}
+                                    colorScheme={proctoredMode ? "orange" : "gray"}
+                                    flex="1"
+                                    fontSize={'sm'}
+                                    disabled
+                                >
+                                    Proctored
+                                </Button>
+                            </ButtonGroup>
+                            <Button colorScheme="green" fontSize={'sm'} onClick={onClose}>
+                                Start Assessment
+                            </Button>
+                        </Flex>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </Flex>
     );
 }

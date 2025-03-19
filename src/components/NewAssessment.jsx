@@ -14,10 +14,10 @@ import {
   Card,
 } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
-import StepTitle from "./Assessments/StepTitle";
-import StepMaterials from "./Assessments/StepMaterials";
-import StepConcentration from "./Assessments/StepConcentration";
-import StepQuestions from "./Assessments/StepQuestions";
+import StepTitle from "./Wizard/StepTitle";
+import StepMaterials from "./Wizard/StepMaterials";
+import StepConcentration from "./Wizard/StepConcentration";
+import StepQuestions from "./Wizard/StepQuestions";
 
 const steps = [
   { title: "Title", component: StepTitle },
