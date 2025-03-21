@@ -189,7 +189,7 @@ const NewAttempt = () => {
                                     {q.type === 'ShortAnswer' && (
                                         <Textarea
                                             p={3}
-                                            resize={false}
+                                            resize="false"
                                             variant={'filled'}
                                             value={q.answer}
                                             onChange={(e) => handleInputChange(q.id, e.target.value)}
@@ -198,7 +198,6 @@ const NewAttempt = () => {
                                     {q.type === 'Essay' && (
                                         <Textarea
                                             p={3}
-                                            resize={false}
                                             variant={'filled'}
                                             value={q.answer}
                                             onChange={(e) => handleInputChange(q.id, e.target.value)}
@@ -219,7 +218,7 @@ const NewAttempt = () => {
                     <Countdown/>
                     <Flex wrap="wrap" gap={1}>
                         {questions.map((q) => {
-                            let colorScheme = q.isMarked ? 'yellow' : q.isAnswered ? 'green' : 'gray';
+                            let colorScheme = q.isMarked ? 'yellow' : q.isAnswered ? 'blue' : 'gray';
                             return (
                                 <Button
                                     key={q.id}

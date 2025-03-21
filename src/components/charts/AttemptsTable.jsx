@@ -1,11 +1,12 @@
 import { Table, TableContainer, Tag, Tbody, Td, Text, Th, Thead, Tr, useColorModeValue } from "@chakra-ui/react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 
 
 const AttemptsTable = ({ data }) => {
   const textColor = useColorModeValue("gray.700", "gray.300");
-
+  const navigate = useNavigate()
   function getPerformanceRating(attempt) {
     if (attempt.max_score === 0) return { rating: "Invalid Score", colorScheme: "gray" }; // Prevent division by zero
   
@@ -32,7 +33,7 @@ const AttemptsTable = ({ data }) => {
           </Thead>
           <Tbody>
             {data.map((attempt) => (
-              <Tr key={attempt.id} role="button" onClick={() => navigate(`/a/${attempt.id}`)}>
+              <Tr key={attempt.id} role="button" onClick={() => navigate(`/t/${attempt.id}`)}>
                 <Td>{attempt.id.slice(0,15)}...</Td>
                 <Td>{attempt.attempt_score}</Td>
                 <Td>{attempt.max_score}</Td>
