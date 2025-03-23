@@ -75,6 +75,7 @@ const FileList = ({ data, refreshFiles }) => {
   }, []);
 
   const handleUpload = async () => {
+    console.log("uploading")
     if (files.length === 0) {
       setError("No files selected.");
       return;
@@ -85,7 +86,6 @@ const FileList = ({ data, refreshFiles }) => {
 
     try {
       const response = await materialUpload(uuid, formData);
-
       if (response.data.status === "success") {
         setFiles([]);
         onClose();
@@ -109,6 +109,7 @@ const FileList = ({ data, refreshFiles }) => {
         });
       }
     } catch (error) {
+      console.log(error)
       setError("Upload failed. Please try again.");
       toast({
         title: "Upload Failed",
@@ -173,7 +174,6 @@ const FileList = ({ data, refreshFiles }) => {
         </Text>
         <Button colorScheme="blue" size="xs" onClick={onOpen}>Upload</Button>
       </Flex>
-
       <Box align="start" overflowY="auto" h="270px">
         {data && data.map((file, index) => {
           const { icon, color } = getFileIcon(file.file_type);

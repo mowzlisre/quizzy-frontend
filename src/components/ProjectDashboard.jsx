@@ -18,21 +18,27 @@ function ProjectDashboard() {
         setUuid(uuidFromUrl);
     }, []);
 
+    
+    const fetchProjects = async () => {
+        try {
+            const response = await projectViewAPI(uuid);
+            setProject(response.data);
+        } catch (error) {
+            console.log("Handle")
+            handleAPIErrors(error, navigate)
+        }
+        };
+
     useEffect(() => {
         if(uuid){
-            const fetchProjects = async () => {
-            try {
-                const response = await projectViewAPI(uuid);
-                setProject(response.data);
-            } catch (error) {
-                console.log("Handle")
-                handleAPIErrors(error, navigate)
-            }
-            };
         
             fetchProjects();
         }
-      }, [uuid]);
+    }, [uuid]);
+
+    const refreshFiles = () => {
+        fetchProjects()
+    }
 
     return (
         project &&
@@ -50,7 +56,7 @@ function ProjectDashboard() {
                 </Box>
                 <Box>
                     <Card p={3} h={"full"}>
-                        <FileList data={project.materials} />
+                        <FileList data={project.materials} refreshFiles={refreshFiles} />
                     </Card>
                 </Box>
             </Grid>
