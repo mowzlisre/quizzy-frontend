@@ -46,12 +46,13 @@ const getFileIcon = (type) => {
 const FileList = ({ data, refreshFiles }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const textColor = useColorModeValue("gray.700", "gray.300");
-  const bg = useColorModeValue("gray.50", "gray.900");
   const toast = useToast();
   
   const [uuid, setUuid] = useState("");
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false)
+
   useEffect(() => {
     const url = window.location.pathname;
     const uuidFromUrl = url.split("/").pop();
@@ -81,6 +82,7 @@ const FileList = ({ data, refreshFiles }) => {
     setFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
   const handleUpload = async () => {
+    setUploading(true)
     if (files.length === 0) {
       setError("No files selected.");
       return;
@@ -100,7 +102,7 @@ const FileList = ({ data, refreshFiles }) => {
           duration: 3000
         });
 
-        refreshFiles(); // ✅ Refresh file list after upload
+        refreshFiles();
       } else {
         setError("File Parsing failed.");
         toast({
@@ -117,6 +119,7 @@ const FileList = ({ data, refreshFiles }) => {
         duration: 3000
       });
     }
+    setUploading(false)
   };
 
   const handleDelete = async (id) => {
@@ -237,12 +240,9 @@ const FileList = ({ data, refreshFiles }) => {
                 })}
               </Box>
             )}
-
-
-
             <Flex mt={4} justifyContent="space-between">
               <Button size={"sm"} onClick={onClose}>Cancel</Button>
-              <Button size={"sm"} colorScheme="blue" onClick={handleUpload} isDisabled={files.length === 0}>
+              <Button size={"sm"} colorScheme="blue" onClick={handleUpload} isLoading={uploading} isDisabled={files.length === 0}>
                 Upload
               </Button>
             </Flex>

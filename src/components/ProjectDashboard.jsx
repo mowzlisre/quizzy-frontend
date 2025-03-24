@@ -41,7 +41,7 @@ function ProjectDashboard() {
     }
 
     const handleNewAssessment = () => {
-        if (project.materials.length === 0) {
+        if (project.materials === undefined || project.materials.length === 0) {
           toast({
             title: "Project Materials are empty",
             status: "warning",

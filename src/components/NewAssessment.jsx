@@ -18,6 +18,7 @@ import StepTitle from "./Wizard/StepTitle";
 import StepMaterials from "./Wizard/StepMaterials";
 import StepConcentration from "./Wizard/StepConcentration";
 import StepQuestions from "./Wizard/StepQuestions";
+import { handleAPIErrors, projectViewAPI } from "../api";
 
 const steps = [
   { title: "Title", component: StepTitle },
@@ -28,14 +29,14 @@ const steps = [
 
 const NewAssessment = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { uuid } = useParams();
   const { activeStep, setActiveStep } = useSteps({ index: 0, count: steps.length });
 
   // Form States
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("MowzliSreMohanDass");
+  const [apiMaterials, setApiMaterials] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [concentration, setConcentration] = useState([]);
-  const [additionalInfo, setAdditionalInfo] = useState("")
   const [questionCounts, setQuestionCounts] = useState({ mcq: 0, maq: 0, shortAnswer: 0, longAnswer: 0 });
   const [valid, setValid] = useState(false);
 
@@ -45,10 +46,23 @@ const NewAssessment = () => {
 
   // Handle Form Submission
   const handleSubmit = () => {
-    const assessmentData = { id, title, materials, concentration, questionCounts };
+    const assessmentData = { uuid, title, materials, concentration, questionCounts };
     console.log("Assessment Created:", assessmentData);
     navigate(-1);
   };
+
+  const fetchProjects = async () => {
+    try {
+        const response = await projectViewAPI(uuid);
+        setApiMaterials(response.data.materials);
+    } catch (error) {
+        handleAPIErrors(error, navigate)
+    }
+  };
+  
+  useEffect(() => {
+    fetchProjects()
+  }, [])
 
   const ActiveStepComponent = steps[activeStep].component;
 
@@ -81,10 +95,9 @@ const NewAssessment = () => {
       
         <Box maxW={"600px"} mt={6}>
           <ActiveStepComponent
-            title={title} setTitle={setTitle}
+            title={title} setTitle={setTitle} apiMaterials={apiMaterials}
             materials={materials} setMaterials={setMaterials}
             concentration={concentration} setConcentration={setConcentration}
-            additionalInfo={additionalInfo} setAdditionalInfo={setAdditionalInfo}
             questionCounts={questionCounts} setQuestionCounts={setQuestionCounts}
           />
         </Box>

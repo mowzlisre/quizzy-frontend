@@ -1,17 +1,21 @@
 import {
-    Box, Button, Card, Flex, Stat, StatLabel, StatNumber, Text,
-    useColorModeValue, useDisclosure, Modal, ModalOverlay, ModalContent,
-    ModalHeader, ModalBody, ModalFooter, ModalCloseButton, ButtonGroup,
-    Checkbox, VStack,
+    Box, Button,
+    ButtonGroup,
+    Card, Flex,
     HStack,
-    useNumberInput,
-    Input
+    Input,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalOverlay,
+    Stat, StatLabel, StatNumber, Text,
+    useColorModeValue, useDisclosure
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { assessmentViewAPI } from "../api";
-import AttemptsTable from "./charts/AttemptsTable";
 import { LuAlarmClockCheck, LuAlarmClockOff } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import { assessmentViewAPI } from "../api";
+import AttemptsTable from "./charts/AttemptsTable";
 
 function AssessmentDashboard({ uuid }) {
     const color = useColorModeValue("gray.100", "gray.700");
@@ -35,14 +39,13 @@ function AssessmentDashboard({ uuid }) {
     const [duration, setDuration] = useState(20); // keep as numeric
 
     const format = (val) => `${val} Minutes`;
-    const parse = (val) => Number(val.replace(/\s*Minutes$/, '').trim());
 
     const inc = {
-    onClick: () => setDuration((prev) => (prev < 120 ? prev + 5 : prev)),
+        onClick: () => setDuration((prev) => (prev < 120 ? prev + 5 : prev)),
     };
 
     const dec = {
-    onClick: () => setDuration((prev) => (prev > 10 ? prev - 5 : prev)),
+        onClick: () => setDuration((prev) => (prev > 10 ? prev - 5 : prev)),
     };
 
 
