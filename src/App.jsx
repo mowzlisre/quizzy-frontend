@@ -26,7 +26,7 @@ function Layout() {
           <Route path="new" element={<CreateProject />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path=":type/:uuid" element={<Sandbox />} />
-          <Route path="id/new" element={<NewAssessment />} />
+          <Route path="a/new/:uuid" element={<NewAssessment />} />
           <Route path="*" element={<Navigate to="/app/dashboard" />} />
         </Routes>
       </Flex>

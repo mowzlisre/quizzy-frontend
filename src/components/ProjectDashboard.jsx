@@ -1,4 +1,4 @@
-import { Box, Button, Card, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Button, Card, Flex, Grid, Text, useToast } from "@chakra-ui/react";
 import { GoPlus } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import AggregateScore from "./charts/AggregateScore";
@@ -9,7 +9,7 @@ import { handleAPIErrors, projectViewAPI } from "../api";
 
 function ProjectDashboard() {
     const navigate = useNavigate();
-    
+    const toast = useToast()
     const [uuid, setUuid] = useState("");
     const [project, setProject] = useState({})
     useEffect(() => {
@@ -40,6 +40,19 @@ function ProjectDashboard() {
         fetchProjects()
     }
 
+    const handleNewAssessment = () => {
+        if (project.materials.length === 0) {
+          toast({
+            title: "Project Materials are empty",
+            status: "warning",
+            duration: 3000,
+          });
+          return;
+        }
+        navigate(`/a/new/${uuid}`)
+      };
+      
+
     return (
         project &&
         <Flex direction={'column'} p={4} width="100%" gap={4} overflowY={'auto'}>
@@ -66,7 +79,7 @@ function ProjectDashboard() {
                         <Text fontSize="md" fontWeight="bold">
                             Assessments on {project.name}
                         </Text>
-                        <Button colorScheme={"green"} size={'sm'} gap={1} onClick={() => navigate(`/id/new`)}>
+                        <Button colorScheme={"green"} size={'sm'} gap={1} onClick={handleNewAssessment}>
                             <GoPlus fontSize={16} /> New
                         </Button>
                     </Flex>

@@ -5,6 +5,7 @@ import {
   ModalBody,
   ModalContent,
   ModalOverlay,
+  Spinner,
   Text, useColorModeValue,
   useDisclosure,
   useToast
@@ -15,6 +16,7 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { FaFileAlt, FaFileExcel, FaFileImage, FaFilePdf, FaFilePowerpoint, FaFileWord } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { materialDelete, materialUpload } from "../../api"; 
+import { FiAlertTriangle } from "react-icons/fi";
 
 const MAX_FILES = 3;
 const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB
@@ -50,7 +52,6 @@ const FileList = ({ data, refreshFiles }) => {
   const [uuid, setUuid] = useState("");
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
-
   useEffect(() => {
     const url = window.location.pathname;
     const uuidFromUrl = url.split("/").pop();
@@ -58,24 +59,28 @@ const FileList = ({ data, refreshFiles }) => {
   }, []);
 
   const onDrop = useCallback((acceptedFiles) => {
-    const totalSize = acceptedFiles.reduce((acc, file) => acc + file.size, 0);
-
-    if (acceptedFiles.length > MAX_FILES) {
+    const newFiles = [...files, ...acceptedFiles];
+  
+    const totalSize = newFiles.reduce((acc, file) => acc + file.size, 0);
+  
+    if (newFiles.length > MAX_FILES) {
       setError(`You can only upload up to ${MAX_FILES} files.`);
       return;
     }
-
+  
     if (totalSize > MAX_TOTAL_SIZE) {
       setError("Total file size exceeds 100MB.");
       return;
     }
-
-    setFiles(acceptedFiles);
+  
+    setFiles(newFiles);  // ✅ Appends to current list
     setError("");
-  }, []);
-
+  }, [files]);
+  
+  const removeFile = (indexToRemove) => {
+    setFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
   const handleUpload = async () => {
-    console.log("uploading")
     if (files.length === 0) {
       setError("No files selected.");
       return;
@@ -91,10 +96,8 @@ const FileList = ({ data, refreshFiles }) => {
         onClose();
         toast({
           title: "Upload Successful!",
-          description: "Your files have been uploaded successfully.",
           status: "success",
-          duration: 3000,
-          isClosable: true
+          duration: 3000
         });
 
         refreshFiles(); // ✅ Refresh file list after upload
@@ -102,55 +105,43 @@ const FileList = ({ data, refreshFiles }) => {
         setError("File Parsing failed.");
         toast({
           title: "Upload Failed",
-          description: "Could not parse the files.",
           status: "error",
-          duration: 3000,
-          isClosable: true
+          duration: 3000
         });
       }
     } catch (error) {
-      console.log(error)
       setError("Upload failed. Please try again.");
       toast({
         title: "Upload Failed",
-        description: "An error occurred while uploading the file.",
         status: "error",
-        duration: 3000,
-        isClosable: true
+        duration: 3000
       });
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      console.log(id);
       const response = await materialDelete(uuid, id);
       if (response.data.status === "success") {
         toast({
           title: "File Deleted",
-          description: "The file has been successfully removed.",
           status: "success",
-          duration: 3000,
-          isClosable: true
+          duration: 3000
         });
 
         refreshFiles(); 
       } else {
         toast({
           title: "Delete Failed",
-          description: "An error occurred while deleting the file.",
           status: "error",
-          duration: 3000,
-          isClosable: true
+          duration: 3000
         });
       }
     } catch (error) {
       toast({
         title: "Delete Failed",
-        description: "Could not delete the file. Please try again.",
         status: "error",
-        duration: 3000,
-        isClosable: true
+        duration: 3000
       });
     }
   };
@@ -165,6 +156,7 @@ const FileList = ({ data, refreshFiles }) => {
     },
     onDropRejected: () => setError("Invalid file type."),
   });
+  
 
   return (
     <Box py={2} borderRadius="md" boxShadow="sm">
@@ -182,8 +174,14 @@ const FileList = ({ data, refreshFiles }) => {
               leftIcon={<Icon as={icon} boxSize={4} color={color} />}
               variant="ghost" fontSize="sm">
               <Flex width={"100%"} justifyContent={'space-between'}>
-                <Text my={'auto'}>{file.name}</Text>
-                <Box onClick={() => handleDelete(file.id)} cursor="pointer">
+                <Text my={'auto'}>{file.name.substring(0,15)}...</Text>
+                <Box gap={3} display={'flex'} onClick={() => handleDelete(file.id)} cursor="pointer" _hover={{ color: "red.500" }}>
+                  <Box my={'auto'}>
+                    {
+                      JSON.parse(file.important_tokens || "[]").length === 0 &&
+                      <FiAlertTriangle color="orange" />
+                    }
+                  </Box>
                   <MdDeleteOutline color="gray.400" fontSize={20} />
                 </Box>
               </Flex>
@@ -208,18 +206,39 @@ const FileList = ({ data, refreshFiles }) => {
               </Alert>
             )}
 
-            {files.length === 0 ? (
-              <Box {...getRootProps()} p={10} border="2px dashed gray" borderRadius="md"
-                textAlign="center" cursor="pointer">
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <Text color="blue.500">Drop the files here...</Text>
-                ) : (
-                  <Text>Drag & Drop files here, or click to select</Text>
-                )}
-                <Icon as={AiOutlineCloudUpload} boxSize={10} mt={3} color="gray.500" />
+            <Box {...getRootProps()} p={6} border="2px dashed gray" borderRadius="md"
+              textAlign="center" cursor="pointer" mb={4}>
+              <input {...getInputProps()} />
+              {isDragActive ? (
+                <Text color="blue.500">Drop the files here...</Text>
+              ) : (
+                <Text>Drag & Drop files here, or click to select</Text>
+              )}
+              <Icon as={AiOutlineCloudUpload} boxSize={10} mt={3} color="gray.500" />
+            </Box>
+
+            {files.length > 0 && (
+              <Box border="1px solid #eee" borderRadius="md" p={3} mb={4}>
+                <Text mb={2} fontWeight="bold">Files to Upload:</Text>
+                {files.map((file, index) => {
+                  const ext = file.name.split('.').pop().toLowerCase();
+                  const { icon, color } = getFileIcon(ext);
+                  return (
+                    <Flex key={index} justify="space-between" align="center" mb={2}>
+                      <Flex align="center" gap={2}>
+                        <Icon as={icon} color={color} />
+                        <Text fontSize="sm">{file.name}</Text>
+                      </Flex>
+                      <Box onClick={() => removeFile(index)} gap={3} cursor="pointer" _hover={{ color: "red.500" }}>
+                        <MdDeleteOutline fontSize={20} />
+                      </Box>
+                    </Flex>
+                  );
+                })}
               </Box>
-            ) : null}
+            )}
+
+
 
             <Flex mt={4} justifyContent="space-between">
               <Button size={"sm"} onClick={onClose}>Cancel</Button>
