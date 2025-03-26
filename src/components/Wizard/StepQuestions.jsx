@@ -5,7 +5,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 // Question types with short form as key and full name as display label
 const questionTypes = [
   ["mcq", "Multiple Choice Questions"],
-  ["maq", "Multiple Answer Questions"],
+  ["fill", "Fill Ups"],
   ["shortAnswer", "Short Answer Questions"],
   ["longAnswer", "Long Answer Questions"],
 ];

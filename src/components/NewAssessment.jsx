@@ -18,7 +18,7 @@ import StepTitle from "./Wizard/StepTitle";
 import StepMaterials from "./Wizard/StepMaterials";
 import StepConcentration from "./Wizard/StepConcentration";
 import StepQuestions from "./Wizard/StepQuestions";
-import { handleAPIErrors, projectViewAPI } from "../api";
+import { createNewAssessment, handleAPIErrors, projectViewAPI } from "../api";
 
 const steps = [
   { title: "Title", component: StepTitle },
@@ -37,29 +37,54 @@ const NewAssessment = () => {
   const [apiMaterials, setApiMaterials] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [concentration, setConcentration] = useState([]);
-  const [questionCounts, setQuestionCounts] = useState({ mcq: 0, maq: 0, shortAnswer: 0, longAnswer: 0 });
+  const [questionCounts, setQuestionCounts] = useState({ mcq: 0, fill: 0, shortAnswer: 0, longAnswer: 0 });
   const [valid, setValid] = useState(false);
 
   // Handle Step Navigation
   const nextStep = () => activeStep < steps.length - 1 && setActiveStep(activeStep + 1);
   const prevStep = () => activeStep > 0 && setActiveStep(activeStep - 1);
-
+  const [isLoading, setIsLoading] = useState(false);
   // Handle Form Submission
-  const handleSubmit = () => {
-    const assessmentData = { uuid, title, materials, concentration, questionCounts };
-    console.log("Assessment Created:", assessmentData);
-    navigate(-1);
-  };
-
-  const fetchProjects = async () => {
+  const handleSubmit = async () => {
+    const materialUUIDs = materials.map((mat) => mat.id);
+  
+    const assessmentData = {
+      uuid,
+      title,
+      materials: materialUUIDs,
+      concentration,
+      questionCounts,
+    };
+    console.log(assessmentData)
     try {
-        const response = await projectViewAPI(uuid);
-        setApiMaterials(response.data.materials);
+      setIsLoading(true);
+      const response = await createNewAssessment(assessmentData);
+      const responseData = response.data;
+  
+      setIsLoading(false);
+  
+      if (responseData.status === "success") {
+        navigate(-1);
+      } else {
+        alert("Assessment creation failed: " + (responseData.error || "Unknown error"));
+      }
     } catch (error) {
-        handleAPIErrors(error, navigate)
+      setIsLoading(false);
+      handleAPIErrors(error, navigate);
     }
   };
   
+
+
+  const fetchProjects = async () => {
+    try {
+      const response = await projectViewAPI(uuid);
+      setApiMaterials(response.data.materials);
+    } catch (error) {
+      handleAPIErrors(error, navigate)
+    }
+  };
+
   useEffect(() => {
     fetchProjects()
   }, [])
@@ -75,7 +100,7 @@ const NewAssessment = () => {
       setValid(true);
     }
   }, [title, materials, activeStep]);
-  
+
 
   return (
     <Box p={6} mx="auto">
@@ -92,7 +117,7 @@ const NewAssessment = () => {
             </Step>
           ))}
         </Stepper>
-      
+
         <Box maxW={"600px"} mt={6}>
           <ActiveStepComponent
             title={title} setTitle={setTitle} apiMaterials={apiMaterials}
@@ -105,7 +130,7 @@ const NewAssessment = () => {
         <HStack justify="space-between" mt={6}>
           <Button isDisabled={activeStep === 0} onClick={prevStep}>Back</Button>
           {activeStep === steps.length - 1 ? (
-            <Button colorScheme="green" onClick={handleSubmit} isDisabled={!valid}>Submit</Button>
+            <Button colorScheme="green" onClick={handleSubmit} isDisabled={!valid} isLoading={isLoading}>Submit</Button>
           ) : (
             <Button colorScheme="blue" onClick={nextStep} isDisabled={!valid}>Next</Button>
           )}
