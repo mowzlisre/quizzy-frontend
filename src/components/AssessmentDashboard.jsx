@@ -14,8 +14,9 @@ import {
 import { useEffect, useState } from "react";
 import { LuAlarmClockCheck, LuAlarmClockOff } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import { assessmentViewAPI } from "../api";
+import { assessmentViewAPI, createNewAttempt } from "../api";
 import AttemptsTable from "./charts/AttemptsTable";
+import { da } from "date-fns/locale";
 
 function AssessmentDashboard({ uuid }) {
     const color = useColorModeValue("gray.100", "gray.700");
@@ -87,6 +88,25 @@ function AssessmentDashboard({ uuid }) {
         scores.sort((a, b) => a - b);
         const mid = Math.floor(scores.length / 2);
         return scores.length % 2 !== 0 ? scores[mid] : ((scores[mid - 1] + scores[mid]) / 2).toFixed(2);
+    }
+
+    const handleNewAttempt = async () => {
+        const attemptData = {
+            uuid,
+            mode,
+            partialScoring,
+            negativeScoring,
+            proctoredMode,
+            duration,
+        };
+        try {
+            const response = await createNewAttempt(attemptData);
+            const data = response.data;
+            onClose();
+            navigate(`/t/${data.id}`, { state: { attempt: data } });
+        } catch (error) {
+            console.error("Error starting new attempt:", error);
+        }
     }
 
     return (
@@ -213,7 +233,7 @@ function AssessmentDashboard({ uuid }) {
                                     Proctored
                                 </Button>
                             </ButtonGroup>
-                            <Button colorScheme="green" fontSize={'sm'} onClick={() => navigate('/n/6accc545-6271-4780-9541-39c1f1850aeb')}>
+                            <Button colorScheme="green" fontSize={'sm'} onClick={handleNewAttempt}>
                                 Start Assessment
                             </Button>
                         </Flex>

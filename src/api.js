@@ -44,6 +44,8 @@ export const projectViewAPI = (uuid) => API.get(`api/project/${uuid}`);
 export const projectAssessmentsViewAPI = (uuid) => API.get(`api/project/${uuid}/assessments`);
 export const assessmentViewAPI = (uuid) => API.get(`/api/assessment/${uuid}`);
 export const createNewAssessment = (data) => API.post('/api/assessment/new', data);
+export const createNewAttempt = (data) => API.post('/api/attempt/new', data);
+export const startAttempt = (data) => API.post('/api/attempt/start', data);
 export const materialUpload = (uuid, data) => API_MP.post(`/api/project/${uuid}/upload`, data);
 export const materialDelete = (uuid, id) => API.post(`/api/project/${uuid}/delete`, {id});
 

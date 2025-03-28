@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar';
 import Login from './components/auth/Login';
 import CreateProject from './components/CreateProject';
 import NewAttempt from './components/Assessment/NewAttempt';
+import AssessmentBanner from './components/Assessment/AssessmentBanner';
 
 function Layout() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -27,6 +28,7 @@ function Layout() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path=":type/:uuid" element={<Sandbox />} />
           <Route path="a/new/:uuid" element={<NewAssessment />} />
+          <Route path="t/:uuid" element={<AssessmentBanner />} />
           <Route path="*" element={<Navigate to="/app/dashboard" />} />
         </Routes>
       </Flex>
@@ -46,7 +48,7 @@ function App() {
 
         {/* Redirect root to /app/dashboard */}
         <Route path="*" element={<Navigate to="/app/dashboard" />} />
-        <Route path="/n/:uuid" element={<NewAttempt/>} />
+        <Route path="/n/:id" element={<NewAttempt/>} />
       </Routes>
     </BrowserRouter>
   );

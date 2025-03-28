@@ -5,6 +5,8 @@ import { FiMoon, FiSun } from 'react-icons/fi';
 import { MdBookmark } from 'react-icons/md';
 import "@/index.css"
 import Countdown from './CountDown';
+import { startAttempt } from '../../api';
+import { useLocation, useParams } from 'react-router-dom';
 
 // Sample Questions
 const initialQuestions = [
@@ -16,7 +18,29 @@ const initialQuestions = [
 
 const NewAttempt = () => {
     const { colorMode, toggleColorMode } = useColorMode();
-    const [questions, setQuestions] = useState(initialQuestions);
+    const [questions, setQuestions] = useState([]);
+    const location = useLocation();
+    const uuid = location.state?.uuid;
+    const { id } = useParams();
+
+    useEffect(() => {
+        const handleStartAttempt = async () => {
+            const data = { id, uuid };
+            try {
+                const response = await startAttempt(data);
+                setQuestions(response.data.quiz)
+                console.log(response.data.quiz)
+            } catch (error) {
+                console.error("Error starting new attempt:", error);
+            }
+        };
+    
+        if (uuid) {
+            handleStartAttempt(); // ✅ actually invoke the function
+        } else {
+            console.error("UUID is undefined!");
+        }
+    }, [id, uuid]);
 
     useEffect(() => {
         const enterFullScreen = () => {
@@ -86,6 +110,9 @@ const NewAttempt = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
+
+
+
     const handleSubmit = () => {
         const unansweredQuestions = questions.filter(q => !q.isAnswered);
         const markedQuestions = questions.filter(q => q.isMarked);
@@ -107,6 +134,7 @@ const NewAttempt = () => {
 
     
     return (
+        questions && questions.length > 0 &&
         <>
             {/* Theme Toggle */}
             <Flex justifyContent={"end"}>
@@ -147,7 +175,7 @@ const NewAttempt = () => {
                                     {q.type !== 'FillUp' &&
                                     <Text>{q.question}</Text>
                                     }               
-                                    {q.type === 'MCQ' && (
+                                    {q.type === 'mcq' && (
                                         q.options.map((option, index) => (
                                             <Button
                                                 key={index}
@@ -156,14 +184,17 @@ const NewAttempt = () => {
                                                 px={5}
                                                 py={8}
                                                 width={"100%"}
+                                                whiteSpace="normal"
+                                                textAlign="left"    
                                                 colorScheme={q.answer === option ? "blue" : "gray"}
                                                 onClick={() => handleMCQSelect(q.id, option)}
+                                                
                                             >
                                                 {option}
                                             </Button>
                                         ))
                                     )}
-                                    {q.type === 'FillUp' && (
+                                    {q.type === 'fill' && (
                                         <Text>
                                             {(() => {
                                                 // Split the question at the placeholder '_answer_'
@@ -186,7 +217,7 @@ const NewAttempt = () => {
                                         </Text>
                                     
                                     )}
-                                    {q.type === 'ShortAnswer' && (
+                                    {q.type === 'short' && (
                                         <Textarea
                                             p={3}
                                             resize="false"
@@ -195,7 +226,7 @@ const NewAttempt = () => {
                                             onChange={(e) => handleInputChange(q.id, e.target.value)}
                                         />
                                     )}
-                                    {q.type === 'Essay' && (
+                                    {q.type === 'long' && (
                                         <Textarea
                                             p={3}
                                             variant={'filled'}
