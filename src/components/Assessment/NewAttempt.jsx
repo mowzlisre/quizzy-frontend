@@ -1,71 +1,49 @@
+import "@/index.css";
 import { Box, Button, Card, Center, Divider, Flex, Input, Text, Textarea, useColorMode } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { FaAngleUp } from 'react-icons/fa';
 import { FiMoon, FiSun } from 'react-icons/fi';
 import { MdBookmark } from 'react-icons/md';
-import "@/index.css"
-import Countdown from './CountDown';
+import { useParams } from 'react-router-dom';
 import { startAttempt } from '../../api';
-import { useLocation, useParams } from 'react-router-dom';
+import Countdown from './CountDown';
 
-// Sample Questions
-const initialQuestions = [
-    { id: 1, type: 'MCQ', question: 'Which SQL clause filters results before grouping?', options: ['WHERE', 'HAVING', 'GROUP BY', 'ORDER BY'], answer: '', isAnswered: false, isMarked: false },
-    { id: 2, type: 'FillUp', question: 'The _answer_ constraint ensures uniqueness.', answer: '', isAnswered: false, isMarked: false },
-    { id: 3, type: 'ShortAnswer', question: 'What is the difference between PRIMARY KEY and UNIQUE KEY?', answer: '', isAnswered: false, isMarked: false },
-    { id: 4, type: 'Essay', question: 'Explain different types of SQL joins with examples.', answer: '', isAnswered: false, isMarked: false }
-];
 
 const NewAttempt = () => {
     const { colorMode, toggleColorMode } = useColorMode();
     const [questions, setQuestions] = useState([]);
-    const location = useLocation();
-    const uuid = location.state?.uuid;
+    const uuid = localStorage.getItem('uuid');
+    const attempt = JSON.parse(localStorage.getItem('attempt_meta'));
     const { id } = useParams();
-
+    const [isMounted, setIsMounted] = useState(false);
+    const [startTime, setStartTime] = useState(null);
+    
     useEffect(() => {
         const handleStartAttempt = async () => {
             const data = { id, uuid };
             try {
                 const response = await startAttempt(data);
-                setQuestions(response.data.quiz)
-                console.log(response.data.quiz)
+                setQuestions(response.data.quiz);
             } catch (error) {
                 console.error("Error starting new attempt:", error);
             }
         };
     
         if (uuid) {
-            handleStartAttempt(); // ✅ actually invoke the function
+            handleStartAttempt();
         } else {
             console.error("UUID is undefined!");
         }
     }, [id, uuid]);
 
     useEffect(() => {
-        const enterFullScreen = () => {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
-                document.documentElement.msRequestFullscreen();
-            }
-        };
-
-        enterFullScreen();
-
-        // Optional: Exit fullscreen automatically when component unmounts
-        return () => {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
-                document.msExitFullscreen();
-            }
-        };
-    }, []);
+        if (questions.length > 0 && !startTime) {
+            setIsMounted(true);
+            const now = new Date();
+            setStartTime(now.toISOString());
+            console.log("Quiz started at:", now.toISOString());
+        }
+    }, [questions, startTime]);
 
     // Handle MCQ selection
     const handleMCQSelect = (qId, option) => {
@@ -110,12 +88,26 @@ const NewAttempt = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-
-
-
     const handleSubmit = () => {
+        const endTime = new Date();
+        const totalDuration = startTime
+            ? (endTime - new Date(startTime)) / 1000 // seconds
+            : null;
+    
         const unansweredQuestions = questions.filter(q => !q.isAnswered);
         const markedQuestions = questions.filter(q => q.isMarked);
+    
+        const summary = {
+            start_time: startTime,
+            end_time: endTime.toISOString(),
+            duration_in_seconds: totalDuration,
+            total_questions: questions.length,
+            answered: questions.filter(q => q.isAnswered).length,
+            marked: markedQuestions.length,
+            uuid: id,
+        };
+    
+        console.log("Submission Summary:", summary);
     
         if (unansweredQuestions.length > 0 || markedQuestions.length > 0) {
             let message = `You have ${unansweredQuestions.length} unanswered question(s) and ${markedQuestions.length} marked question(s).\nDo you want to submit anyway?`;
@@ -131,6 +123,7 @@ const NewAttempt = () => {
             alert("Your attempt has been submitted successfully!");
         }
     };
+    
 
     
     return (
@@ -146,8 +139,7 @@ const NewAttempt = () => {
             {/* Quiz Layout */}
             <Flex justifyContent={"center"} p={10} pb={{base: 0, xl: 10}}>
                 <Card p={10} width={"100%"} maxW={"1376px"} gap={3}>
-                    <Text fontSize={"3xl"}>MongoDB Introduction</Text>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sint atque, perspiciatis dignissimos dolore animi consequuntur rerum harum enim, pariatur, perferendis placeat iste commodi doloribus optio totam minima ullam molestiae accusamus!</p>
+                    <Text fontSize={"3xl"}>{attempt.title}</Text>
                 </Card>
             </Flex>
 
@@ -172,10 +164,9 @@ const NewAttempt = () => {
                                     </Button>
                                 </Flex>
                                 <Flex direction={'column'} gap={5}>
-                                    {q.type !== 'FillUp' &&
                                     <Text>{q.question}</Text>
-                                    }               
                                     {q.type === 'mcq' && (
+                                        q.options &&
                                         q.options.map((option, index) => (
                                             <Button
                                                 key={index}
@@ -188,36 +179,21 @@ const NewAttempt = () => {
                                                 textAlign="left"    
                                                 colorScheme={q.answer === option ? "blue" : "gray"}
                                                 onClick={() => handleMCQSelect(q.id, option)}
-                                                
                                             >
                                                 {option}
                                             </Button>
                                         ))
                                     )}
                                     {q.type === 'fill' && (
-                                        <Text>
-                                            {(() => {
-                                                // Split the question at the placeholder '_answer_'
-                                                let chunks = q.question.split('_answer_');
-                                        
-                                                return (
-                                                    <>
-                                                        {chunks[0]}
-                                                        <Input
-                                                            width="20%"
-                                                            textAlign="center"
-                                                            variant="flushed"
-                                                            value={q.answer}
-                                                            onChange={(e) => handleInputChange(q.id, e.target.value)}
-                                                        />
-                                                        {chunks[1]}
-                                                    </>
-                                                );
-                                            })()}
-                                        </Text>
+                                        <Input
+                                            width="30%"
+                                            variant="flushed"
+                                            value={q.answer}
+                                            onChange={(e) => handleInputChange(q.id, e.target.value)}
+                                        />
                                     
                                     )}
-                                    {q.type === 'short' && (
+                                    {q.type === 'shortAnswer' && (
                                         <Textarea
                                             p={3}
                                             resize="false"
@@ -226,7 +202,7 @@ const NewAttempt = () => {
                                             onChange={(e) => handleInputChange(q.id, e.target.value)}
                                         />
                                     )}
-                                    {q.type === 'long' && (
+                                    {q.type === 'longAnswer' && (
                                         <Textarea
                                             p={3}
                                             variant={'filled'}
@@ -246,7 +222,9 @@ const NewAttempt = () => {
 
                 {/* Right Section - Question Numbers & Status */}
                 <Flex position={"sticky"} top={"20"} alignSelf={'start'} order={{ base: 1, xl: 3 }} direction={'column'} minW={{base: "100%", xl: "30%"}} px={{xl: 5}} gap={8} pb={{base: 10}}>
-                    <Countdown/>
+                    {isMounted && (
+                        <Countdown totalTime={attempt.total_duration * 60} timed={attempt.timed} />
+                    )}
                     <Flex wrap="wrap" gap={1}>
                         {questions.map((q) => {
                             let colorScheme = q.isMarked ? 'yellow' : q.isAnswered ? 'blue' : 'gray';

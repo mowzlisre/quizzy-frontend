@@ -12,7 +12,7 @@ const AssessmentBanner = () => {
     const location = useLocation();
     const attempt = location.state?.attempt;
     const navigate = useNavigate();
-
+    localStorage.setItem("attempt_meta", JSON.stringify(attempt))
     useEffect(() => {
         if (!attempt) {
             const interval = setInterval(() => {
@@ -53,7 +53,6 @@ const AssessmentBanner = () => {
         negative_score,
         proctored
     } = attempt;
-    console.log(id, uuid)
     const desc = `This is a ${proctored ? 'proctored' : 'non-proctored'}, ` +
         `${timed ? 'timed' : 'untimed'} assessment with ` +
         `${partial_credits ? 'partial scoring enabled' : 'partial scoring disabled'} ` +
@@ -72,14 +71,18 @@ const AssessmentBanner = () => {
                 </Text>
 
                 <Text fontSize="md" mb={2}>
-                    ⏱ Duration: {total_duration} minutes
+                    ⏱ Duration:  {
+                        attempt.timed ?
+                        <>{total_duration} minutes</>
+                        : "N/A"
+                    } 
                 </Text>
 
                 <Text fontSize="md" mb={4}>
                     🎯 Max Score: {max_score} points
                 </Text>
 
-                <Button colorScheme="teal" size="lg" width="100%" onClick={() => navigate(`/n/${id}`, { state: { uuid: uuid } })}>
+                <Button colorScheme="teal" size="lg" width="100%" onClick={() => {navigate(`/n/${id}`); localStorage.setItem('uuid', uuid)}}>
                     Start Attempt
                 </Button>
             </Card>

@@ -33,7 +33,7 @@ const NewAssessment = () => {
   const { activeStep, setActiveStep } = useSteps({ index: 0, count: steps.length });
 
   // Form States
-  const [title, setTitle] = useState("MowzliSreMohanDass");
+  const [title, setTitle] = useState("");
   const [apiMaterials, setApiMaterials] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [concentration, setConcentration] = useState([]);

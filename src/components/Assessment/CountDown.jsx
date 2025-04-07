@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "@chakra-ui/react";
 
-const Countdown = ({ totalTime = 3600, onTimeUp }) => {  // Default 1 hour (3600s)
+const Countdown = ({ totalTime = 3600, onTimeUp, timed }) => {  // Default 1 hour (3600s)
     const [timeLeft, setTimeLeft] = useState(totalTime);
-
     useEffect(() => {
         if (timeLeft <= 0) {
             if (onTimeUp) onTimeUp(); // Callback when time reaches 0
@@ -31,6 +30,7 @@ const Countdown = ({ totalTime = 3600, onTimeUp }) => {  // Default 1 hour (3600
     };
 
     return (
+        timed &&
         <Box textAlign="center">
             <Text fontSize="xl" fontWeight="bold" color={timeLeft > totalTime * 0.7 ? "green.500" : "red.500"}>
                 {formatTime(timeLeft)} Remaining
