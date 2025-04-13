@@ -32,8 +32,16 @@ const AttemptsTable = ({ data }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {data.map((attempt) => (
-              <Tr key={attempt.id} role="button" onClick={() => navigate(`/t/${attempt.id}`)}>
+            {
+              data.length === 0 ? (
+                <Tr>
+                  <Td colSpan={5} textAlign="center">
+                    <Text color={textColor}>No Attempts Found</Text>
+                  </Td>
+                </Tr>
+              ) :
+              data.map((attempt) => (
+              <Tr key={attempt.id} role="button" onClick={() => navigate(`/d/${attempt.id}`)}>
                 <Td>{attempt.id.slice(0,15)}...</Td>
                 <Td>{attempt.attempt_score}</Td>
                 <Td>{attempt.max_score}</Td>

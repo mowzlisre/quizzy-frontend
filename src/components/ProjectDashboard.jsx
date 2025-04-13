@@ -18,6 +18,11 @@ function ProjectDashboard() {
         setUuid(uuidFromUrl);
     }, []);
 
+    const data = [
+        { name: "Project 1", score: 82.3 },
+        { name: "Project 2", score: 78.9 },
+        { name: "Project 3", score: 88.1 }
+    ]
     
     const fetchProjects = async () => {
         try {
@@ -59,7 +64,7 @@ function ProjectDashboard() {
             <Grid width="100%" templateColumns={{ base: '1fr', md: '1fr 2fr 1fr' }} alignItems={"stretch"} gap={4}>
                 <Box>
                     <Card p={5} h={"full"} py={7} justifyContent={'center'}>
-                        <AggregateScore value={82.3} label={"Score"} />
+                        <AggregateScore value={"NaN"} data={data} label={"Score"} />
                     </Card>
                 </Box>
                 <Box>

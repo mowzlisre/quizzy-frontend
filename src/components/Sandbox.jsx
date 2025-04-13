@@ -11,8 +11,8 @@ function Sandbox() {
     <>
       {type === "p" && <ProjectDashboard uuid={uuid} />}
       {type === "a" && <AssessmentDashboard uuid={uuid} />}
-      {type === "t" && <AtemptAnalytics uuid={uuid} />}
-      {!["p", "a", "t"].includes(type) && (
+      {type === "d" && <AtemptAnalytics uuid={uuid} />}
+      {!["p", "a", "d"].includes(type) && (
         <Flex height="100%" align="center" justify="center">
           <Text fontSize="2xl" color={useColorModeValue("gray.600", "gray.300")}>
             How can I help you?

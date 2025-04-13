@@ -42,9 +42,13 @@ export const logoutAPI = async () => {
 export const projectsViewAPI = () => API.get("api/projects");
 export const projectViewAPI = (uuid) => API.get(`api/project/${uuid}`);
 export const projectAssessmentsViewAPI = (uuid) => API.get(`api/project/${uuid}/assessments`);
+export const attemptAnalytics = (uuid) => API.get(`/api/attempt/${uuid}/analytics`);
 export const assessmentViewAPI = (uuid) => API.get(`/api/assessment/${uuid}`);
+
+export const createNewProject = (data) => API.post('/api/project/new', data);
 export const createNewAssessment = (data) => API.post('/api/assessment/new', data);
 export const createNewAttempt = (data) => API.post('/api/attempt/new', data);
+export const submitAttempt = (id, data) => API.post(`/api/attempt/${id}/submit`, data);
 export const startAttempt = (data) => API.post('/api/attempt/start', data);
 export const materialUpload = (uuid, data) => API_MP.post(`/api/project/${uuid}/upload`, data);
 export const materialDelete = (uuid, id) => API.post(`/api/project/${uuid}/delete`, {id});

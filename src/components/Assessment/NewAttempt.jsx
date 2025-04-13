@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { FaAngleUp } from 'react-icons/fa';
 import { FiMoon, FiSun } from 'react-icons/fi';
 import { MdBookmark } from 'react-icons/md';
-import { useParams } from 'react-router-dom';
-import { startAttempt } from '../../api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { handleAPIErrors, startAttempt, submitAttempt } from '../../api';
 import Countdown from './CountDown';
 
 
@@ -17,7 +17,8 @@ const NewAttempt = () => {
     const { id } = useParams();
     const [isMounted, setIsMounted] = useState(false);
     const [startTime, setStartTime] = useState(null);
-    
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
     useEffect(() => {
         const handleStartAttempt = async () => {
             const data = { id, uuid };
@@ -87,15 +88,38 @@ const NewAttempt = () => {
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
-
+    const handleSubmitAPI = async (id, questions, attemptMeta) => {
+        const data = {
+            quiz: questions,
+            meta: attemptMeta
+        };
+    
+        try {
+            const response = await submitAttempt(id, data);
+            const responseData = response.data;
+    
+            if (responseData.status === "success") {
+                alert("Your attempt has been submitted successfully!");
+                navigate(`/a/${uuid}`);
+            } else {
+                alert("Submission failed: " + (responseData.error || "Unknown error"));
+            }
+        } catch (error) {
+            handleAPIErrors(error, navigate);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    // ✅ Handles final submit click
     const handleSubmit = () => {
         const endTime = new Date();
         const totalDuration = startTime
-            ? (endTime - new Date(startTime)) / 1000 // seconds
-            : null;
+            ? (endTime - new Date(startTime)) / 1000
+            : 0;
     
-        const unansweredQuestions = questions.filter(q => !q.isAnswered);
-        const markedQuestions = questions.filter(q => q.isMarked);
+        const unanswered = questions.filter(q => !q.isAnswered);
+        const marked = questions.filter(q => q.isMarked);
     
         const summary = {
             start_time: startTime,
@@ -103,28 +127,27 @@ const NewAttempt = () => {
             duration_in_seconds: totalDuration,
             total_questions: questions.length,
             answered: questions.filter(q => q.isAnswered).length,
-            marked: markedQuestions.length,
+            marked: marked.length,
             uuid: id,
         };
     
-        console.log("Submission Summary:", summary);
+        const proceedWithSubmit = () => {
+            setIsLoading(true);
+            handleSubmitAPI(id, questions, summary);
+        };
     
-        if (unansweredQuestions.length > 0 || markedQuestions.length > 0) {
-            let message = `You have ${unansweredQuestions.length} unanswered question(s) and ${markedQuestions.length} marked question(s).\nDo you want to submit anyway?`;
-    
-            if (window.confirm(message)) {
-                console.log("Quiz Submitted:", questions);
-                alert("Your attempt has been submitted!");
+        // Confirm if user is submitting with unanswered or marked questions
+        if (unanswered.length > 0 || marked.length > 0) {
+            const confirmMessage = `You have ${unanswered.length} unanswered and ${marked.length} marked question(s).\nDo you still want to submit?`;
+            if (window.confirm(confirmMessage)) {
+                proceedWithSubmit();
             } else {
                 alert("Please review your answers before submitting.");
             }
         } else {
-            console.log("Quiz Submitted:", questions);
-            alert("Your attempt has been submitted successfully!");
+            proceedWithSubmit();
         }
     };
-    
-
     
     return (
         questions && questions.length > 0 &&
@@ -150,7 +173,7 @@ const NewAttempt = () => {
                             <Card key={q.id} p={8} width={"100%"} gap={5}>
                                 <Flex justifyContent={'space-between'}>
                                     <Flex gap={5}>
-                                        <Text fontSize={'xl'}>Question {q.id}</Text>
+                                        <Text fontWeight={"bold"} fontSize={'xl'}>Question {q.id}</Text>
                                         <Button size={'sm'}>{q.type}</Button>
                                     </Flex>
                                     <Button
@@ -260,7 +283,10 @@ const NewAttempt = () => {
                     </Flex>
 
 
-                    <Button width="100%" colorScheme='green'  onClick={handleSubmit}>Submit Test</Button>
+                    <Button width="100%" colorScheme='green' isLoading={isLoading} onClick={handleSubmit} isDisabled={isLoading}>
+                        Submit Test
+                    </Button>
+
                 </Flex>
             <Flex
                 className={`scroll-to-top ${isVisible ? "show" : "hide"}`}

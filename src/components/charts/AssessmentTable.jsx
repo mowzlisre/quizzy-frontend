@@ -65,30 +65,40 @@ const AssessmentTable = ({ uuid }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {assessments.map((assessment) => (
-              <Tr key={assessment.assessment_id} role="button" onClick={() => navigate(`/a/${assessment.id}`)}>
-                <Td>{assessment.assessment_id}</Td>
-                <Td>
-                  <Text isTruncated maxWidth="90%"noOfLines={1}display="block" whiteSpace="nowrap"overflow="hidden"textOverflow="ellipsis">
-                    {assessment.assessment_title}
-                  </Text>
-                </Td>
-                <Td>{assessment.created}</Td>
-                <Td textAlign="center">
-                  <Tag width="70px" size="sm" colorScheme={getDifficultyColor(assessment.difficulty)}>
-                    <Text mx="auto">{assessment.difficulty}</Text>
-                  </Tag>
-                </Td>
-                <Td>{assessment.attempts.length}</Td>
-                <Td>{assessment.recentAttempt}</Td>
-                <Td>
-                  <Tag size="sm" colorScheme={getStatusColor(assessment.status)}>
-                    {assessment.status}
-                  </Tag>
-                </Td>
-                <Td fontWeight="bold">{assessment.avgScore}</Td>
-              </Tr>
-            ))}
+            {
+              assessments && assessments.length > 0 ? (
+              assessments.map((assessment) => (
+                <Tr key={assessment.assessment_id} role="button" onClick={() => navigate(`/a/${assessment.id}`)}>
+                  <Td>{assessment.assessment_id}</Td>
+                  <Td>
+                    <Text isTruncated maxWidth="90%"noOfLines={1}display="block" whiteSpace="nowrap"overflow="hidden"textOverflow="ellipsis">
+                      {assessment.assessment_title}
+                    </Text>
+                  </Td>
+                  <Td>{assessment.created}</Td>
+                  <Td textAlign="center">
+                    <Tag width="70px" size="sm" colorScheme={getDifficultyColor(assessment.difficulty)}>
+                      <Text mx="auto">{assessment.difficulty}</Text>
+                    </Tag>
+                  </Td>
+                  <Td>{assessment.attempts.length}</Td>
+                  <Td>{assessment.recentAttempt}</Td>
+                  <Td>
+                    <Tag size="sm" colorScheme={getStatusColor(assessment.status)}>
+                      {assessment.status}
+                    </Tag>
+                  </Td>
+                  <Td fontWeight="bold">{assessment.avgScore}</Td>
+                </Tr>
+              )))
+              : (
+                <Tr>
+                  <Td colSpan={8} textAlign="center">
+                    <Text color={textColor}>No assessments available</Text>
+                  </Td>
+                </Tr>
+              )
+            }
           </Tbody>
         </Table>
       </TableContainer>
